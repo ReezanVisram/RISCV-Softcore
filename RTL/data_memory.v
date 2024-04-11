@@ -25,7 +25,8 @@ module data_memory(
   begin
     for (i = 1; i < 256; i = i + 1)
     begin
-      memory[i] = 32'hAFAFAFAF;
+      memory[i] = 0;
     end
+    memory[4] = 32'h88913416;
   end
 endmodule

@@ -17,5 +17,6 @@ module instruction_memory(
       rom[i] = 32'h00000000;
     end
     rom[0] = 32'h00402103; // Load word at address x0 (0) + 00000004 into x2
+    rom[4] = 32'h00202423; // Store word in x2 at address x0 (0) + 8
   end
 endmodule

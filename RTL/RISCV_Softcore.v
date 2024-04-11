@@ -35,7 +35,26 @@ module RISCV_Softcore(
   wire [31:0] reg_d_data;
   wire [31:0] alu_result;
 
-  wire [31:0] write_data;
+  reg [31:0] write_data;
+
+  reg [31:0] alu_input;
+
+  always @(*)
+  begin
+    if (opcode[5])
+    begin
+      write_reg_file = 0;
+      data_mem_write_enable = 1;
+      alu_input = immediate_s;
+      write_data = reg_data_2;
+    end
+    else
+    begin
+      write_reg_file = 1;
+      data_mem_write_enable = 0;
+      alu_input = immediate_i;
+    end
+  end
   program_counter pc(
                     .clk_i(clk),
                     .reset_i(ck_rst),
@@ -84,7 +103,7 @@ module RISCV_Softcore(
   arithmetic_logic_unit alu(
                           .alu_control_i(alu_control),
                           .data_1_i(reg_data_1),
-                          .data_2_i(immediate_i),
+                          .data_2_i(alu_input),
                           .alu_result_o(alu_result)
                         );
 
