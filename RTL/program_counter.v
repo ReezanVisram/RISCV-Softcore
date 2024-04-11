@@ -3,7 +3,6 @@
 module program_counter(
     input clk_i,
     input reset_i,
-    input write_enable_i,
     input [31:0] address_i,
     output [31:0] address_o
   );
@@ -19,10 +18,7 @@ module program_counter(
     end
     else if (clk_i)
     begin
-      if (write_enable_i)
-      begin
-        pc <= address_i;
-      end
+      pc <= address_i;
     end
   end
 

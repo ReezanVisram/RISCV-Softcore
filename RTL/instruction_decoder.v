@@ -21,6 +21,7 @@ module instruction_decoder(
   assign opcode_o = instruction_i[6:0];
   assign rd_o = instruction_i[11:7];
   assign funct3_o = instruction_i[14:12];
+  assign funct7_o = instruction_i[31:25];
   assign rs1_o = instruction_i[19:15];
   assign rs2_o = instruction_i[24:20];
 

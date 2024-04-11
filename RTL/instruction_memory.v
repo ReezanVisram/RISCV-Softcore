@@ -16,6 +16,6 @@ module instruction_memory(
     begin
       rom[i] = 32'h00000000;
     end
-    rom[0] = 32'h100000B7; // LUI 2^31 into R1
+    rom[0] = 32'h00402103; // Load word at address x0 (0) + 00000004 into x2
   end
 endmodule
