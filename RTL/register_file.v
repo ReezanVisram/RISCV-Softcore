@@ -14,7 +14,6 @@ module register_file(
 
   reg [31:0] register_file [31:0];
 
-  assign register_file[0] = 5'b00000;
   assign reg_data_1_o = register_file[reg_select_1_i];
   assign reg_data_2_o = register_file[reg_select_2_i];
 
@@ -27,6 +26,11 @@ module register_file(
         register_file[reg_select_d_i] <= reg_data_d_i;
       end
     end
+  end
+
+  initial
+  begin
+    register_file[0] = 0;
   end
 
 endmodule
