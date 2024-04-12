@@ -4,8 +4,13 @@ module RISCV_Softcore(
     input clk,
     input ck_rst
   );
-  reg write_reg_file;
-  reg data_mem_write_enable;
+
+  // Control Signals
+  wire mem_to_reg;
+  wire reg_write;
+  wire mem_write;
+  wire [1:0] alu_src; // 00 = immediate_i, 01 = immediate_s, 10 = rs2, 11 = invalid
+
   reg [2:0] alu_control;
 
   reg [31:0] pc_addition_constant;
@@ -38,24 +43,42 @@ module RISCV_Softcore(
   reg [31:0] write_data;
 
   reg [31:0] alu_input;
-  reg [1:0] mem_mode; // 00 = byte, 01 = halfword, 10 = word, 11 = invalid
 
   always @(*)
   begin
-    if (opcode[5])
-    begin
-      write_reg_file = 0;
-      data_mem_write_enable = 1;
-      alu_input = immediate_s;
-      write_data = reg_data_2;
-    end
-    else
-    begin
-      write_reg_file = 1;
-      data_mem_write_enable = 0;
-      alu_input = immediate_i;
-    end
+    case (alu_src)
+      2'b00:
+      begin
+        alu_input = immediate_i;
+      end
+      2'b01:
+      begin
+        alu_input = immediate_s;
+      end
+      2'b10:
+      begin
+        alu_input = reg_data_2;
+      end
+      default:
+      begin
+
+      end
+    endcase
+
+    write_data = reg_data_2;
   end
+
+  control_logic ctrl_log(
+                  .opcode_i(opcode),
+                  .funct3_i(funct3),
+                  .funct7_i(funct7),
+                  .mem_to_reg_o(mem_to_reg),
+                  .reg_write_o(reg_write),
+                  .mem_write_o(mem_write),
+                  .alu_src_o(alu_src)
+                );
+
+
   program_counter pc(
                     .clk_i(clk),
                     .reset_i(ck_rst),
@@ -92,7 +115,7 @@ module RISCV_Softcore(
 
   register_file reg_file(
                   .clk_i(clk),
-                  .write_enable_i(write_reg_file),
+                  .write_enable_i(reg_write),
                   .reg_select_1_i(reg_select_1),
                   .reg_select_2_i(reg_select_2),
                   .reg_select_d_i(reg_select_d),
@@ -110,19 +133,15 @@ module RISCV_Softcore(
 
   data_memory data_mem(
                 .clk_i(clk),
-                .write_enable_i(data_mem_write_enable),
+                .write_enable_i(mem_write),
                 .address_i(alu_result),
                 .data_i(write_data),
                 .funct3_i(funct3),
                 .data_o(reg_d_data)
               );
-
   initial
   begin
-    write_reg_file = 1;
-    alu_control = 3'b010;
-    data_mem_write_enable = 0;
     pc_addition_constant = 32'h00000004;
+    alu_control = 3'b010;
   end
-
 endmodule
