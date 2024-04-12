@@ -55,25 +55,6 @@ module RISCV_Softcore(
       data_mem_write_enable = 0;
       alu_input = immediate_i;
     end
-
-    case (funct3)
-      3'b000:
-      begin
-        mem_mode = 2'b00;
-      end
-      3'b001:
-      begin
-        mem_mode = 2'b01;
-      end
-      3'b010:
-      begin
-        mem_mode = 2'b10;
-      end
-      default:
-      begin
-        mem_mode = 2'bxx;
-      end
-    endcase
   end
   program_counter pc(
                     .clk_i(clk),
@@ -131,8 +112,8 @@ module RISCV_Softcore(
                 .clk_i(clk),
                 .write_enable_i(data_mem_write_enable),
                 .address_i(alu_result),
-                .mem_mode_i(mem_mode),
                 .data_i(write_data),
+                .funct3_i(funct3),
                 .data_o(reg_d_data)
               );
 

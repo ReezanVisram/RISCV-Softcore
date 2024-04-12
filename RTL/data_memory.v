@@ -4,8 +4,8 @@ module data_memory(
     input clk_i,
     input write_enable_i,
     input [31:0] address_i,
-    input [1:0] mem_mode_i,
     input [31:0] data_i,
+    input [2:0] funct3_i,
     output reg [31:0] data_o
   );
   integer i;
@@ -14,22 +14,30 @@ module data_memory(
 
   always @(*)
   begin
-    case (mem_mode_i)
-      2'b00:
+    case (funct3_i)
+      3'b000:
       begin
         data_o = {{24{memory[address_i][7]}}, memory[address_i]};
       end
-      2'b01:
+      3'b001:
       begin
         data_o = {{16{memory[address_i + 1][7]}}, memory[address_i + 1], memory[address_i]};
       end
-      2'b10:
+      3'b010:
       begin
         data_o = {memory[address_i + 3], memory[address_i + 2], memory[address_i + 1], memory[address_i]};
       end
+      3'b100:
+      begin
+        data_o = {24'h000000, memory[address_i]};
+      end
+      3'b101:
+      begin
+        data_o = {16'h0000, memory[address_i + 1], memory[address_i]};
+      end
       default:
       begin
-        data_o = 32'bX;
+        // NOP
       end
     endcase
   end
@@ -38,17 +46,17 @@ module data_memory(
   begin
     if (write_enable_i)
     begin
-      case (mem_mode_i)
-        2'b00:
+      case (funct3_i)
+        3'b000:
         begin
           memory[address_i] <= data_i[7:0];
         end
-        2'b01:
+        2'b001:
         begin
           memory[address_i] <= data_i[15:8];
           memory[address_i + 1] <= data_i[7:0];
         end
-        2'b10:
+        2'b010:
         begin
           memory[address_i] <= data_i[31:24];
           memory[address_i + 1] <= data_i[23:16];
@@ -57,10 +65,7 @@ module data_memory(
         end
         default:
         begin
-          memory[address_i] <= 7'bX;
-          memory[address_i + 1] <= 7'bX;
-          memory[address_i + 2] <= 7'bX;
-          memory[address_i + 3] <= 7'bX;
+          // NOP
         end
       endcase
     end
