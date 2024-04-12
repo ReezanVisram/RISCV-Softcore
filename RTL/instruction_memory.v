@@ -6,17 +6,35 @@ module instruction_memory(
   );
   integer i;
 
-  reg [31:0] rom [0:255];
+  reg [7:0] rom [0:1023];
 
-  assign instruction_o = rom[address_i];
+  assign instruction_o = {rom[address_i + 3], rom[address_i + 2], rom[address_i + 1], rom[address_i]};
 
   initial
   begin
-    for (i = 1; i < 256; i = i + 1)
+    for (i = 0; i < 1024; i = i + 1)
     begin
       rom[i] = 32'h00000000;
     end
-    rom[0] = 32'h00402103; // Load word at address x0 (0) + 00000004 into x2
-    rom[4] = 32'h00202423; // Store word in x2 at address x0 (0) + 8
+    // rom[0] = 32'h00402103;
+    // rom[4] = 32'h00202423; // Store word in x2 at address x0 (0) + 8
+
+    // Load word at address x0 (0) + 00000004 into x2
+    rom[0] = 8'h03;
+    rom[1] = 8'h21;
+    rom[2] = 8'h40;
+    rom[3] = 8'h00;
+
+    // Load byte at address x0 (0) + 4 into x3
+    rom[4] = 8'h83;
+    rom[5] = 8'h01;
+    rom[6] = 8'h40;
+    rom[7] = 8'h00;
+
+    // Load halfword at address x0 (0) + 4 into x4
+    rom[8] = 8'h03;
+    rom[9] = 8'h12;
+    rom[10] = 8'h40;
+    rom[11] = 8'h00;
   end
 endmodule
