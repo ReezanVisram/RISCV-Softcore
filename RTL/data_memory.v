@@ -17,11 +17,11 @@ module data_memory(
     case (mem_mode_i)
       2'b00:
       begin
-        data_o = {memory[address_i], 24'h000000};
+        data_o = {{24{memory[address_i][7]}}, memory[address_i]};
       end
       2'b01:
       begin
-        data_o = {memory[address_i + 1], memory[address_i], 16'h0000};
+        data_o = {{16{memory[address_i + 1][7]}}, memory[address_i + 1], memory[address_i]};
       end
       2'b10:
       begin
@@ -38,7 +38,31 @@ module data_memory(
   begin
     if (write_enable_i)
     begin
-      memory[address_i] <= data_i;
+      case (mem_mode_i)
+        2'b00:
+        begin
+          memory[address_i] <= data_i[7:0];
+        end
+        2'b01:
+        begin
+          memory[address_i] <= data_i[15:8];
+          memory[address_i + 1] <= data_i[7:0];
+        end
+        2'b10:
+        begin
+          memory[address_i] <= data_i[31:24];
+          memory[address_i + 1] <= data_i[23:16];
+          memory[address_i + 2] <= data_i[15:8];
+          memory[address_i + 3] <= data_i[7:0];
+        end
+        default:
+        begin
+          memory[address_i] <= 7'bX;
+          memory[address_i + 1] <= 7'bX;
+          memory[address_i + 2] <= 7'bX;
+          memory[address_i + 3] <= 7'bX;
+        end
+      endcase
     end
   end
 

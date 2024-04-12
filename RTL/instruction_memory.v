@@ -36,5 +36,23 @@ module instruction_memory(
     rom[9] = 8'h12;
     rom[10] = 8'h40;
     rom[11] = 8'h00;
+
+    // Store byte in x2 at address x0(0) + 32
+    rom[12] = 8'h23;
+    rom[13] = 8'h00;
+    rom[14] = 8'h20;
+    rom[15] = 8'h02;
+
+    // Store halfword in x2 at address x0 (0) + 48
+    rom[16] = 8'h23;
+    rom[17] = 8'h18;
+    rom[18] = 8'h20;
+    rom[19] = 8'h02;
+
+    // Store word in x2 at address x0(0) + 64
+    rom[20] = 8'h23;
+    rom[21] = 8'h20;
+    rom[22] = 8'h20;
+    rom[23] = 8'h04;
   end
 endmodule
