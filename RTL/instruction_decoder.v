@@ -28,7 +28,7 @@ module instruction_decoder(
   assign immediate_i_o = {{20{instruction_i[31]}}, instruction_i[31:20]};
   assign immediate_s_o = {{20{instruction_i[31]}}, instruction_i[31:25], instruction_i[11:7]};
   assign immediate_u_o = {instruction_i[31:12], 12'h000};
-  assign immediate_b_o = {{20{instruction_i[31]}}, instruction_i[31], instruction_i[7], instruction_i[30:25], instruction_i[11:8], 4'b0};
-  assign immedaite_j_o = {{12{instruction_i[31]}}, instruction_i[31], instruction_i[19:12], instruction_i[20], instruction_i[30:21]};
+  assign immediate_b_o = {{20{instruction_i[31]}}, instruction_i[31], instruction_i[7], instruction_i[30:25], instruction_i[11:8], 4'h0};
+  assign immediate_j_o = {{11{instruction_i[31]}}, instruction_i[31], instruction_i[19:12], instruction_i[20], instruction_i[30:21], 1'b0};
 
 endmodule

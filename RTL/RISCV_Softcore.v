@@ -11,12 +11,13 @@ module RISCV_Softcore(
   wire alu_src_1; // 0 = rs1, 1 = pc
   wire [1:0] alu_src_2; // 00 = immediate_i, 01 = immediate_s, 10 = rs2, 11 = invalid
   wire [1:0] reg_write_src; // 00 = immediate_u, 01 = alu_result, 10 = data_mem_o, 11 = invalid
+  wire pc_src; // 0 = PC + 4, 1 = immediate_j
 
   reg [2:0] alu_control;
 
   reg [31:0] pc_addition_constant;
 
-  wire [31:0] next_instr_addr;
+  reg [31:0] next_instr_addr;
   wire [31:0] curr_instr_addr;
 
   wire [31:0] instruction;
@@ -93,7 +94,17 @@ module RISCV_Softcore(
       end
       default:
       begin
-        // Invalid
+        reg_d_data = curr_instr_addr + 4;
+      end
+    endcase
+    case (pc_src)
+      1'b0:
+      begin
+        next_instr_addr = curr_instr_addr + 4;
+      end
+      1'b1:
+      begin
+        next_instr_addr = immediate_j;
       end
     endcase
     write_data = reg_data_2;
@@ -107,9 +118,9 @@ module RISCV_Softcore(
                   .mem_write_enable_o(mem_write_enable),
                   .alu_src_1_o(alu_src_1),
                   .alu_src_2_o(alu_src_2),
-                  .reg_write_src_o(reg_write_src)
+                  .reg_write_src_o(reg_write_src),
+                  .pc_src_o(pc_src)
                 );
-
 
   program_counter pc(
                     .clk_i(clk),
@@ -117,13 +128,6 @@ module RISCV_Softcore(
                     .address_i(next_instr_addr),
                     .address_o(curr_instr_addr)
                   );
-
-  arithmetic_logic_unit pc_alu(
-                          .alu_control_i(alu_control),
-                          .data_1_i(curr_instr_addr),
-                          .data_2_i(pc_addition_constant),
-                          .alu_result_o(next_instr_addr)
-                        );
 
   instruction_memory instr_mem(
                        .address_i(curr_instr_addr),

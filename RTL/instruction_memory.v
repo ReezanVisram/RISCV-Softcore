@@ -66,5 +66,11 @@ module instruction_memory(
     rom[29] = 8'h13;
     rom[30] = 8'h00;
     rom[31] = 8'h00;
+
+    // Jump to address 48 and store PC + 4 in x8
+    rom[32] = 8'h67;
+    rom[33] = 8'h04;
+    rom[34] = 8'h00;
+    rom[35] = 8'h03;
   end
 endmodule
