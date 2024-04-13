@@ -6,10 +6,10 @@ module RISCV_Softcore(
   );
 
   // Control Signals
-  wire mem_to_reg;
-  wire reg_write;
-  wire mem_write;
+  wire reg_write_enable;
+  wire mem_write_enable;
   wire [1:0] alu_src; // 00 = immediate_i, 01 = immediate_s, 10 = rs2, 11 = invalid
+  wire [1:0] reg_write_src; // 00 = immediate_u, 01 = alu_result, 10 = data_mem_o, 11 = invalid
 
   reg [2:0] alu_control;
 
@@ -37,8 +37,9 @@ module RISCV_Softcore(
   wire [31:0] immediate_b;
   wire [31:0] immediate_j;
 
-  wire [31:0] reg_d_data;
+  reg [31:0] reg_d_data;
   wire [31:0] alu_result;
+  wire [31:0] data_mem_out;
 
   reg [31:0] write_data;
 
@@ -61,7 +62,26 @@ module RISCV_Softcore(
       end
       default:
       begin
+        // Invalid
+      end
+    endcase
 
+    case (reg_write_src)
+      2'b00:
+      begin
+        reg_d_data = immediate_u;
+      end
+      2'b01:
+      begin
+        reg_d_data = alu_result;
+      end
+      2'b10:
+      begin
+        reg_d_data = data_mem_out;
+      end
+      default:
+      begin
+        // Invalid
       end
     endcase
 
@@ -72,10 +92,10 @@ module RISCV_Softcore(
                   .opcode_i(opcode),
                   .funct3_i(funct3),
                   .funct7_i(funct7),
-                  .mem_to_reg_o(mem_to_reg),
-                  .reg_write_o(reg_write),
-                  .mem_write_o(mem_write),
-                  .alu_src_o(alu_src)
+                  .reg_write_enable_o(reg_write_enable),
+                  .mem_write_enable_o(mem_write_enable),
+                  .alu_src_o(alu_src),
+                  .reg_write_src_o(reg_write_src)
                 );
 
 
@@ -115,7 +135,7 @@ module RISCV_Softcore(
 
   register_file reg_file(
                   .clk_i(clk),
-                  .write_enable_i(reg_write),
+                  .write_enable_i(reg_write_enable),
                   .reg_select_1_i(reg_select_1),
                   .reg_select_2_i(reg_select_2),
                   .reg_select_d_i(reg_select_d),
@@ -133,11 +153,11 @@ module RISCV_Softcore(
 
   data_memory data_mem(
                 .clk_i(clk),
-                .write_enable_i(mem_write),
+                .write_enable_i(mem_write_enable),
                 .address_i(alu_result),
                 .data_i(write_data),
                 .funct3_i(funct3),
-                .data_o(reg_d_data)
+                .data_o(data_mem_out)
               );
   initial
   begin

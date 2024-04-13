@@ -54,5 +54,11 @@ module instruction_memory(
     rom[21] = 8'h20;
     rom[22] = 8'h20;
     rom[23] = 8'h04;
+
+    // LUI 55555000 into x12
+    rom[24] = 8'h37;
+    rom[25] = 8'h56;
+    rom[26] = 8'h55;
+    rom[27] = 8'h55;
   end
 endmodule
