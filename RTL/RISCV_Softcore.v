@@ -8,7 +8,8 @@ module RISCV_Softcore(
   // Control Signals
   wire reg_write_enable;
   wire mem_write_enable;
-  wire [1:0] alu_src; // 00 = immediate_i, 01 = immediate_s, 10 = rs2, 11 = invalid
+  wire alu_src_1; // 0 = rs1, 1 = pc
+  wire [1:0] alu_src_2; // 00 = immediate_i, 01 = immediate_s, 10 = rs2, 11 = invalid
   wire [1:0] reg_write_src; // 00 = immediate_u, 01 = alu_result, 10 = data_mem_o, 11 = invalid
 
   reg [2:0] alu_control;
@@ -43,26 +44,37 @@ module RISCV_Softcore(
 
   reg [31:0] write_data;
 
-  reg [31:0] alu_input;
+  reg [31:0] alu_input_1;
+  reg [31:0] alu_input_2;
 
   always @(*)
   begin
-    case (alu_src)
+    case (alu_src_1)
+      1'b0:
+      begin
+        alu_input_1 = reg_data_1;
+      end
+      1'b1:
+      begin
+        alu_input_1 = curr_instr_addr;
+      end
+    endcase
+    case (alu_src_2)
       2'b00:
       begin
-        alu_input = immediate_i;
+        alu_input_2 = immediate_i;
       end
       2'b01:
       begin
-        alu_input = immediate_s;
+        alu_input_2 = immediate_s;
       end
       2'b10:
       begin
-        alu_input = reg_data_2;
+        alu_input_2 = reg_data_2;
       end
-      default:
+      2'b11:
       begin
-        // Invalid
+        alu_input_2 = immediate_u;
       end
     endcase
 
@@ -84,7 +96,6 @@ module RISCV_Softcore(
         // Invalid
       end
     endcase
-
     write_data = reg_data_2;
   end
 
@@ -94,7 +105,8 @@ module RISCV_Softcore(
                   .funct7_i(funct7),
                   .reg_write_enable_o(reg_write_enable),
                   .mem_write_enable_o(mem_write_enable),
-                  .alu_src_o(alu_src),
+                  .alu_src_1_o(alu_src_1),
+                  .alu_src_2_o(alu_src_2),
                   .reg_write_src_o(reg_write_src)
                 );
 
@@ -146,8 +158,8 @@ module RISCV_Softcore(
 
   arithmetic_logic_unit alu(
                           .alu_control_i(alu_control),
-                          .data_1_i(reg_data_1),
-                          .data_2_i(alu_input),
+                          .data_1_i(alu_input_1),
+                          .data_2_i(alu_input_2),
                           .alu_result_o(alu_result)
                         );
 

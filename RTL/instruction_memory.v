@@ -60,5 +60,11 @@ module instruction_memory(
     rom[25] = 8'h56;
     rom[26] = 8'h55;
     rom[27] = 8'h55;
+
+    // Add 2^12 to the PC (28) and store it in x6 (should be 29)
+    rom[28] = 8'h17;
+    rom[29] = 8'h13;
+    rom[30] = 8'h00;
+    rom[31] = 8'h00;
   end
 endmodule
