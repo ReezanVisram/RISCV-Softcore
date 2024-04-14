@@ -10,7 +10,7 @@ module RISCV_Softcore(
   wire mem_write_enable;
   wire [1:0] alu_src_2; // 00 = immediate_i, 01 = immediate_s, 10 = rs2, 11 = invalid
   wire [1:0] reg_write_src; // 00 = immediate_u, 01 = alu_result, 10 = data_mem_o, 11 = invalid
-  wire pc_src; // 0 = PC + 4, 1 = immediate_j
+  wire jump;
 
   reg [2:0] alu_control;
 
@@ -90,7 +90,17 @@ module RISCV_Softcore(
       end
     endcase
 
-    next_instr_addr = curr_instr_addr + 4;
+    case (jump)
+      1'b0:
+      begin
+        next_instr_addr = curr_instr_addr + 4;
+      end
+      1'b1:
+      begin
+        next_instr_addr = branch_alu_result;
+      end
+    endcase
+
     write_data = reg_data_2;
   end
 
@@ -101,7 +111,8 @@ module RISCV_Softcore(
                   .reg_write_enable_o(reg_write_enable),
                   .mem_write_enable_o(mem_write_enable),
                   .alu_src_2_o(alu_src_2),
-                  .reg_write_src_o(reg_write_src)
+                  .reg_write_src_o(reg_write_src),
+                  .jump_o(jump)
                 );
 
   program_counter pc(
