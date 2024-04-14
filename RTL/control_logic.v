@@ -7,7 +7,7 @@ module control_logic(
 
     output reg reg_write_enable_o,
     output reg mem_write_enable_o,
-    output reg [1:0] alu_src_2_o, // 00 = immediate_i, 01 = immediate_s, 10 = rs2, 11 = immediate_u
+    output reg [1:0] alu_src_2_o, // 00 = immediate_i, 01 = immediate_s, 10 = immediate_u, 11 = rs2
     output reg [1:0] reg_write_src_o // 00 = immediate_u, 01 = alu_result, 10 = data_mem_o, 11 = PC + 4
   );
 
@@ -18,14 +18,14 @@ module control_logic(
       begin
         reg_write_enable_o = 1'b1;
         mem_write_enable_o = 1'b0;
-        alu_src_2_o = 2'b11;
+        alu_src_2_o = 2'b10;
         reg_write_src_o = 2'b00;
       end
       7'b0010111: // AUIPC
       begin
         reg_write_enable_o = 1'b1;
         mem_write_enable_o = 1'b0;
-        alu_src_2_o = 2'b11;
+        alu_src_2_o = 2'b10;
         reg_write_src_o = 2'b01;
       end
       7'b0000011: // LB, LH, LW

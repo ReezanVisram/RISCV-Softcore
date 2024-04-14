@@ -63,11 +63,11 @@ module RISCV_Softcore(
       end
       2'b10:
       begin
-        alu_input_2 = reg_data_2;
+        alu_input_2 = immediate_u;
       end
       2'b11:
       begin
-        alu_input_2 = immediate_u;
+        alu_input_2 = reg_data_2;
       end
     endcase
 
