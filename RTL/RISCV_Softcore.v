@@ -10,7 +10,8 @@ module RISCV_Softcore(
   wire mem_write_enable;
   wire [1:0] alu_src_2; // 00 = immediate_i, 01 = immediate_s, 10 = rs2, 11 = invalid
   wire [1:0] reg_write_src; // 00 = immediate_u, 01 = alu_result, 10 = data_mem_o, 11 = invalid
-  wire jump;
+  wire [1:0] jump; // 00 = no jump, 01 = jal, 10 = jalr, 11 = no jump
+  wire branch_alu_src_1;
 
   reg [2:0] alu_control;
 
@@ -91,13 +92,17 @@ module RISCV_Softcore(
     endcase
 
     case (jump)
-      1'b0:
+      2'b01:
+      begin
+        next_instr_addr = curr_instr_addr + immediate_j;
+      end
+      2'b11:
+      begin
+        next_instr_addr = reg_data_1 + immediate_i;
+      end
+      default:
       begin
         next_instr_addr = curr_instr_addr + 4;
-      end
-      1'b1:
-      begin
-        next_instr_addr = branch_alu_result;
       end
     endcase
 
@@ -122,12 +127,12 @@ module RISCV_Softcore(
                     .address_o(curr_instr_addr)
                   );
 
-  arithmetic_logic_unit branch_alu(
-                          .alu_control_i(branch_alu_control),
-                          .data_1_i(curr_instr_addr),
-                          .data_2_i(immediate_j),
-                          .alu_result_o(branch_alu_result)
-                        );
+  // arithmetic_logic_unit branch_alu(
+  //                         .alu_control_i(branch_alu_control),
+  //                         .data_1_i(curr_instr_addr),
+  //                         .data_2_i(immediate_j),
+  //                         .alu_result_o(branch_alu_result)
+  //                       );
 
   instruction_memory instr_mem(
                        .address_i(curr_instr_addr),

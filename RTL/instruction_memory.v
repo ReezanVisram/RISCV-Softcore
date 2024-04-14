@@ -6,7 +6,7 @@ module instruction_memory(
   );
   integer i;
 
-  reg [7:0] rom [0:27];
+  reg [7:0] rom [0:31];
 
   assign instruction_o = {rom[address_i + 3], rom[address_i + 2], rom[address_i + 1], rom[address_i]};
 
